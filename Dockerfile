@@ -1,5 +1,6 @@
 ARG TARGET=milkv-duos-glibc-arm64-emmc
-ARG SDK_HASH=6f8962c394dd0a05729abb089f0feb7d5cc4aa5e
+#ARG SDK_HASH=6f8962c394dd0a05729abb089f0feb7d5cc4aa5e
+ARG SDK_HASH=main
 ARG ARM_TOOLCHAIN_VERSION=14.3.Rel1
 ARG RISCV_TOOLCHAIN_VERSION=15.2-r1
 ARG CMAKE_VERSION=4.0.4
@@ -10,7 +11,7 @@ ARG TARGETARCH
 FROM --platform=linux/amd64 milkvtech/milkv-duo:latest AS builder
 
 WORKDIR /build
-RUN git clone https://github.com/milkv-duo/duo-buildroot-sdk-v2.git sdk && \
+RUN git clone https://github.com/vincent-precix/duo-buildroot-sdk-v2.git sdk && \
     git clone https://github.com/milkv-duo/host-tools.git host-tools && \
     wget https://github.com/milkv-duo/duo-buildroot-sdk-v2/releases/download/dl/dl.tar
 
@@ -29,7 +30,7 @@ WORKDIR /build/sdk
 ARG TARGET
 ENV FORCE_UNSAFE_CONFIGURE=1
 
-RUN ./build.sh ${TARGET}
+RUN TPU_REL=0 ./build.sh ${TARGET}
 
 # we wont use the toolchains from host-tools because
 # we will just use official toolchains
@@ -52,6 +53,7 @@ RUN apt-get update && \
         make \
         gdb-multiarch \
         openssh-server \
+        pkg-config \
         && \
     apt-get -y remove --purge --auto-remove cmake && \
     rm -rf /var/lib/apt/lists/*
